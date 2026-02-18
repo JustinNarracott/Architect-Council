@@ -1,0 +1,48 @@
+# Security Policies — secrets, auth, dependencies, and compliance
+
+secrets:
+  scanning: required
+  allowed_storage:
+    - Environment variables
+    - Secret manager (AWS SSM, Vault, etc.)
+  never_in_code:
+    - API keys
+    - Database credentials
+    - JWT signing keys
+    - Private keys or certificates
+  gitignore_required:
+    - ".env"
+    - "*.pem"
+    - "*.key"
+    - "*.p12"
+    - ".secrets"
+
+authentication:
+  required: true
+  approved_methods:
+    - JWT with short-lived access tokens and refresh tokens
+    - OAuth2 / OpenID Connect
+    - API key with rate limiting (for service-to-service only)
+  session_requirements:
+    - Tokens must expire (max 1 hour for access, 30 days for refresh)
+    - Refresh token rotation on use
+    - Secure, HttpOnly, SameSite cookies for web apps
+
+dependencies:
+  max_age_months: 12
+  vulnerability_policy: "No known HIGH or CRITICAL CVEs in production dependencies"
+  lockfile_required: true
+  audit_frequency: "Weekly automated scan"
+
+error_handling:
+  stack_traces: "Never expose in production API responses"
+  sensitive_data: "Never log PII, credentials, or tokens"
+  error_responses: "Return generic error messages to clients, log details server-side"
+
+input_validation:
+  required: true
+  approach: "Validate at API boundary using schema validation (Pydantic, Zod, etc.)"
+  injection_prevention:
+    - "Parameterised queries only (no string interpolation in SQL)"
+    - "Sanitise HTML output to prevent XSS"
+    - "Validate file paths to prevent traversal"

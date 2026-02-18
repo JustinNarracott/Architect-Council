@@ -1,0 +1,40 @@
+# Technology Radar — classify technologies by adoption status
+# Agents will evaluate whether the codebase uses technologies appropriately
+
+adopt:
+  description: "Approved for production use. Preferred choices."
+  technologies:
+    - PostgreSQL
+    - Redis
+    - Python 3.11+
+    - TypeScript
+    - React
+    - FastAPI
+    - Docker
+    - GitHub Actions
+
+trial:
+  description: "Approved for non-critical use. Evaluate actively."
+  technologies:
+    - Kafka
+    - GraphQL
+    - Rust
+    - Bun
+    - Deno
+
+assess:
+  description: "Under evaluation. Use only in spikes/prototypes."
+  technologies:
+    - MongoDB
+    - gRPC
+    - HTMX
+
+hold:
+  description: "Do not use for new work. Migrate away when practical."
+  technologies:
+    - jQuery
+    - AngularJS
+    - CouchDB
+    - Vagrant
+    - Jenkins
+    - Svelte

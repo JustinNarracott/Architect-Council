@@ -17,10 +17,13 @@ services:
       - RELOAD=${RELOAD:-false}
       # Suppress LiteLLM proxy import noise (apscheduler etc.)
       - LITELLM_LOG=ERROR
-      # Ollama local GPU server for Security Analyst (override via .env if needed)
-      - OLLAMA_API_BASE=${OLLAMA_API_BASE:-http://192.168.1.101:11434}
+      # Ollama local model server for Security Analyst
+      # Override in .env if your Ollama runs on a different host/port
+      - OLLAMA_API_BASE=${OLLAMA_API_BASE:-http://localhost:11434}
     volumes:
-      - D:\Projects:/repos:ro
+      # Mount your local repositories for codebase analysis
+      # Set REPOS_PATH in .env to point to your projects directory
+      - ${REPOS_PATH:-./repos}:/repos:ro
       - ../governance/defaults:/app/governance/defaults
     restart: unless-stopped
 

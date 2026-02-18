@@ -1,0 +1,30 @@
+# Architecture Standards — structure, boundaries, and API design
+
+approved_styles:
+  - Layered architecture (routes → services → repositories → data)
+  - Event-driven with message broker for async workflows
+  - Microservices with API gateway (for multi-service systems)
+  - Modular monolith with clear module boundaries
+
+constraints:
+  max_import_depth: 5
+  max_circular_dependencies: 0
+  max_module_coupling: "No module should import from more than 10 other internal modules"
+  separation_of_concerns:
+    - Infrastructure code (DB, HTTP, queues) must be separate from domain logic
+    - Configuration must not be scattered — centralise in config module
+    - Shared utilities must be in a dedicated utils/common module
+
+api_standards:
+  versioning: "URL path versioning (/v1/, /v2/) or header versioning"
+  naming: "kebab-case for endpoints, plural nouns for resources"
+  methods: "GET for reads, POST for creates, PUT/PATCH for updates, DELETE for deletes"
+  responses: "Consistent envelope: { data, error, metadata }"
+  pagination: "Cursor-based or offset-based, never return unbounded lists"
+  auth: "All endpoints authenticated unless explicitly marked public"
+
+data_layer:
+  orm_required: true
+  raw_sql: "Only in performance-critical paths with comment explaining why"
+  migrations: "All schema changes via migration files, never manual DDL"
+  connection_pooling: "Required for production deployments"

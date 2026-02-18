@@ -66,8 +66,8 @@ Like having a design authority board available 24/7 in under 60 seconds.
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/CloudAI-X/architecture-council.git
-   cd architecture-council
+   git clone https://github.com/JustinNarracott/architect-council.git
+   cd architect-council
    ```
 
 2. **Set up environment variables**
@@ -203,8 +203,7 @@ architecture-council/
 │   └── test_adrs.json
 ├── .env.example          # Environment template
 ├── pyproject.toml        # Python dependencies
-├── ROADMAP.md            # Sprint plan
-├── CLAUDE.md             # Scope control
+├── CONTRIBUTING.md       # Contribution guidelines
 └── README.md
 ```
 
