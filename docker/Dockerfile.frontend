@@ -1,0 +1,23 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install bun
+RUN npm install -g bun
+
+# Copy frontend package manifests first (better caching)
+COPY frontend/package.json ./
+
+# Copy lockfiles if they exist (Docker COPY fails if file missing, so we avoid listing them)
+# We'll just copy the whole frontend next and let bun resolve/install.
+
+# Copy frontend source
+COPY frontend ./
+
+# Install deps
+RUN bun install
+
+ENV PORT=3000
+EXPOSE 3000
+
+CMD ["bun", "dev", "--port", "3000"]

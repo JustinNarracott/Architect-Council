@@ -1,0 +1,123 @@
+[
+  {
+    "name": "customer-api",
+    "status": "active",
+    "owner_team": "Customer Platform",
+    "description": "Core customer data management and profile API",
+    "capabilities": ["customer registration", "profile management", "customer search", "data export"],
+    "technology_stack": ["Python", "FastAPI", "PostgreSQL", "Redis"],
+    "api_endpoints": ["/api/v1/customers", "/api/v1/customers/{id}", "/api/v1/customers/search"],
+    "data_classification": "PII",
+    "repository": "https://github.com/org/customer-api"
+  },
+  {
+    "name": "order-service",
+    "status": "active",
+    "owner_team": "Commerce",
+    "description": "Order processing and fulfillment orchestration",
+    "capabilities": ["order creation", "order tracking", "fulfillment", "returns processing"],
+    "technology_stack": ["Node.js", "TypeScript", "PostgreSQL", "Kafka"],
+    "api_endpoints": ["/api/v1/orders", "/api/v1/orders/{id}/status", "/api/v1/orders/{id}/cancel"],
+    "data_classification": "CONFIDENTIAL",
+    "repository": "https://github.com/org/order-service"
+  },
+  {
+    "name": "billing-api",
+    "status": "active",
+    "owner_team": "Finance",
+    "description": "Billing, invoicing, and payment processing",
+    "capabilities": ["invoice generation", "payment processing", "subscription management", "tax calculation"],
+    "technology_stack": ["Python", "Django", "PostgreSQL", "Stripe API"],
+    "api_endpoints": ["/api/v1/billing/invoices", "/api/v1/billing/payments", "/api/v1/billing/subscriptions"],
+    "data_classification": "RESTRICTED",
+    "repository": "https://github.com/org/billing-api"
+  },
+  {
+    "name": "notification-service",
+    "status": "active",
+    "owner_team": "Platform",
+    "description": "Multi-channel notification delivery (email, SMS, push)",
+    "capabilities": ["email delivery", "SMS messaging", "push notifications", "notification templates"],
+    "technology_stack": ["Go", "Kafka", "Redis", "SendGrid", "Twilio"],
+    "api_endpoints": ["/api/v1/notifications/send", "/api/v1/notifications/templates"],
+    "data_classification": "INTERNAL",
+    "repository": "https://github.com/org/notification-service"
+  },
+  {
+    "name": "auth-service",
+    "status": "active",
+    "owner_team": "Security",
+    "description": "Authentication and authorization service",
+    "capabilities": ["user authentication", "OAuth2 flows", "JWT token management", "RBAC", "SSO integration"],
+    "technology_stack": ["Node.js", "TypeScript", "PostgreSQL", "Redis", "Auth0"],
+    "api_endpoints": ["/api/v1/auth/login", "/api/v1/auth/token", "/api/v1/auth/permissions"],
+    "data_classification": "RESTRICTED",
+    "repository": "https://github.com/org/auth-service"
+  },
+  {
+    "name": "search-service",
+    "status": "active",
+    "owner_team": "Platform",
+    "description": "Full-text search across products, customers, and content",
+    "capabilities": ["product search", "customer search", "autocomplete", "search analytics"],
+    "technology_stack": ["Python", "Elasticsearch", "Kafka"],
+    "api_endpoints": ["/api/v1/search", "/api/v1/search/suggest", "/api/v1/search/analytics"],
+    "data_classification": "INTERNAL",
+    "repository": "https://github.com/org/search-service"
+  },
+  {
+    "name": "analytics-pipeline",
+    "status": "active",
+    "owner_team": "Data",
+    "description": "Real-time and batch analytics data pipeline",
+    "capabilities": ["event ingestion", "data transformation", "metrics aggregation", "data warehouse sync"],
+    "technology_stack": ["Python", "Apache Spark", "Kafka", "Snowflake"],
+    "api_endpoints": ["/api/v1/analytics/events", "/api/v1/analytics/metrics"],
+    "data_classification": "CONFIDENTIAL",
+    "repository": "https://github.com/org/analytics-pipeline"
+  },
+  {
+    "name": "cdn-proxy",
+    "status": "active",
+    "owner_team": "Infrastructure",
+    "description": "CDN integration and asset delivery proxy",
+    "capabilities": ["image optimization", "asset caching", "CDN purge", "dynamic resizing"],
+    "technology_stack": ["Nginx", "Varnish", "Cloudflare Workers"],
+    "api_endpoints": ["/api/v1/cdn/purge", "/api/v1/cdn/stats"],
+    "data_classification": "PUBLIC",
+    "repository": "https://github.com/org/cdn-proxy"
+  },
+  {
+    "name": "admin-dashboard",
+    "status": "active",
+    "owner_team": "Operations",
+    "description": "Internal operations and admin portal",
+    "capabilities": ["user management", "order management", "reporting", "system configuration"],
+    "technology_stack": ["React", "Next.js", "TypeScript", "Tailwind CSS"],
+    "api_endpoints": [],
+    "data_classification": "INTERNAL",
+    "repository": "https://github.com/org/admin-dashboard"
+  },
+  {
+    "name": "mobile-bff",
+    "status": "planned",
+    "owner_team": "Mobile",
+    "description": "Backend for Frontend serving mobile apps",
+    "capabilities": ["aggregated mobile API", "push notification coordination", "offline sync"],
+    "technology_stack": ["Node.js", "TypeScript", "GraphQL"],
+    "api_endpoints": ["/graphql"],
+    "data_classification": "INTERNAL",
+    "repository": "https://github.com/org/mobile-bff"
+  },
+  {
+    "name": "legacy-monolith",
+    "status": "deprecated",
+    "owner_team": "Legacy Systems",
+    "description": "Original monolithic application being migrated",
+    "capabilities": ["all features - being decomposed"],
+    "technology_stack": ["Java", "Spring", "Oracle"],
+    "api_endpoints": ["/legacy/api/*"],
+    "data_classification": "CONFIDENTIAL",
+    "repository": "https://github.com/org/legacy-monolith"
+  }
+]

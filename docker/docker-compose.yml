@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  architecture-council-backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    image: architecture-council-backend:latest
+    ports:
+      - "8011:8000"
+    env_file:
+      - ../.env
+    environment:
+      # Server config (defaults if not in .env)
+      - HOST=${HOST:-0.0.0.0}
+      - PORT=${PORT:-8000}
+      - RELOAD=${RELOAD:-false}
+      # Suppress LiteLLM proxy import noise (apscheduler etc.)
+      - LITELLM_LOG=ERROR
+      # Ollama local GPU server for Security Analyst (override via .env if needed)
+      - OLLAMA_API_BASE=${OLLAMA_API_BASE:-http://192.168.1.101:11434}
+    volumes:
+      - D:\Projects:/repos:ro
+      - ../governance/defaults:/app/governance/defaults
+    restart: unless-stopped
+
+  architecture-council-frontend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
+    image: architecture-council-frontend:latest
+    ports:
+      - "3011:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8011
+    depends_on:
+      - architecture-council-backend
+    restart: unless-stopped

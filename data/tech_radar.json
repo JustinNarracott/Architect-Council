@@ -1,0 +1,41 @@
+{
+  "adopt": [
+    {"name": "Python", "description": "Primary backend language for data processing, APIs, and automation", "approved_since": "2020-01", "conditions": ["Use 3.10+ for new projects", "Follow PEP 8 style guide"], "alternatives": []},
+    {"name": "TypeScript", "description": "Preferred language for frontend and Node.js backend development", "approved_since": "2021-03", "conditions": ["Use strict mode", "Maintain type coverage >90%"], "alternatives": []},
+    {"name": "React", "description": "Standard frontend framework for web applications", "approved_since": "2020-06", "conditions": ["Use functional components and hooks", "Follow React 18+ patterns"], "alternatives": []},
+    {"name": "Next.js", "description": "Full-stack React framework with SSR/SSG capabilities", "approved_since": "2022-01", "conditions": ["Use App Router for new projects", "Leverage server components"], "alternatives": []},
+    {"name": "PostgreSQL", "description": "Primary relational database for OLTP workloads", "approved_since": "2019-01", "conditions": ["Use version 14+", "Enable connection pooling"], "alternatives": []},
+    {"name": "Docker", "description": "Standard containerization platform", "approved_since": "2019-06", "conditions": ["Use multi-stage builds", "Scan images for vulnerabilities"], "alternatives": []},
+    {"name": "Kubernetes", "description": "Container orchestration platform for production workloads", "approved_since": "2021-01", "conditions": ["Use Helm for deployments", "Implement resource limits"], "alternatives": []},
+    {"name": "Terraform", "description": "Infrastructure as Code tool for cloud provisioning", "approved_since": "2020-09", "conditions": ["Use modules for reusability", "Store state in remote backend"], "alternatives": []},
+    {"name": "GitHub Actions", "description": "CI/CD platform integrated with GitHub", "approved_since": "2021-06", "conditions": ["Use reusable workflows", "Secure secrets management"], "alternatives": []},
+    {"name": "FastAPI", "description": "Modern Python web framework for building APIs", "approved_since": "2022-03", "conditions": ["Use async/await patterns", "Generate OpenAPI documentation"], "alternatives": []},
+    {"name": "Tailwind CSS", "description": "Utility-first CSS framework", "approved_since": "2022-09", "conditions": ["Configure design system tokens", "Purge unused styles"], "alternatives": []},
+    {"name": "Redis", "description": "In-memory cache and message broker", "approved_since": "2020-03", "conditions": ["Use for caching and sessions only", "Not for primary data storage"], "alternatives": []}
+  ],
+  "trial": [
+    {"name": "Rust", "description": "Systems programming language for performance-critical components", "approved_since": "2023-06", "conditions": ["Use for CLI tools or performance bottlenecks", "Ensure team has Rust expertise"], "alternatives": ["Python", "Go"]},
+    {"name": "Bun", "description": "Fast JavaScript runtime and toolkit", "approved_since": "2024-01", "conditions": ["Non-production use only", "Evaluate for tooling and scripts"], "alternatives": ["Node.js", "Deno"]},
+    {"name": "Deno", "description": "Secure TypeScript/JavaScript runtime", "approved_since": "2023-09", "conditions": ["Suitable for new microservices", "Not for mission-critical systems yet"], "alternatives": ["Node.js"]},
+    {"name": "htmx", "description": "Hypermedia-driven UI library", "approved_since": "2024-02", "conditions": ["For internal tools only", "Assess team adoption"], "alternatives": ["React", "Vue.js"]},
+    {"name": "Supabase", "description": "Open-source Firebase alternative", "approved_since": "2023-11", "conditions": ["For prototypes and MVPs", "Evaluate vendor lock-in"], "alternatives": ["PostgreSQL + custom backend"]},
+    {"name": "Vercel", "description": "Deployment platform optimized for Next.js", "approved_since": "2023-08", "conditions": ["For frontend applications only", "Monitor costs"], "alternatives": ["AWS", "Self-hosted"]},
+    {"name": "CrewAI", "description": "Multi-agent AI orchestration framework", "approved_since": "2024-01", "conditions": ["For AI/ML experiments", "Evaluate stability for production"], "alternatives": ["LangChain", "Custom orchestration"]},
+    {"name": "LangChain", "description": "Framework for LLM application development", "approved_since": "2023-10", "conditions": ["Use for AI integrations", "Monitor API costs"], "alternatives": ["Direct LLM API usage"]}
+  ],
+  "assess": [
+    {"name": "Zig", "description": "Low-level systems programming language", "approved_since": "2024-01", "conditions": ["Research only", "No production use"], "alternatives": ["Rust", "C"]},
+    {"name": "Mojo", "description": "High-performance Python superset", "approved_since": "2024-02", "conditions": ["Watch for stability", "Evaluate ML use cases"], "alternatives": ["Python"]},
+    {"name": "WebAssembly", "description": "Binary instruction format for web browsers", "approved_since": "2023-07", "conditions": ["Assess performance benefits", "Browser compatibility concerns"], "alternatives": ["JavaScript"]},
+    {"name": "Tauri", "description": "Desktop application framework using web tech", "approved_since": "2023-12", "conditions": ["For desktop app experiments", "Compare with Electron"], "alternatives": ["Electron"]},
+    {"name": "Effect-TS", "description": "Functional programming library for TypeScript", "approved_since": "2024-01", "conditions": ["Team must have FP expertise", "High learning curve"], "alternatives": ["Standard TypeScript"]}
+  ],
+  "hold": [
+    {"name": "jQuery", "description": "Legacy DOM manipulation library", "approved_since": null, "conditions": ["Migrate existing code to modern frameworks"], "alternatives": ["React", "Vue.js", "Vanilla JS"]},
+    {"name": "AngularJS", "description": "Legacy Angular 1.x framework", "approved_since": null, "conditions": ["End of life reached", "Migrate to React or Angular (modern)"], "alternatives": ["React", "Angular"]},
+    {"name": "CoffeeScript", "description": "JavaScript transpiler (deprecated)", "approved_since": null, "conditions": ["Migrate to TypeScript"], "alternatives": ["TypeScript"]},
+    {"name": "Heroku", "description": "Legacy PaaS platform", "approved_since": null, "conditions": ["Migrate to AWS/Azure/GCP", "Cost and vendor lock-in concerns"], "alternatives": ["AWS", "Azure", "GCP"]},
+    {"name": "Jenkins", "description": "Legacy CI/CD tool", "approved_since": null, "conditions": ["Migrate to GitHub Actions", "High maintenance overhead"], "alternatives": ["GitHub Actions", "GitLab CI"]},
+    {"name": "MongoDB", "description": "Document database - not for relational use cases", "approved_since": null, "conditions": ["Only for true document storage needs", "Default to PostgreSQL"], "alternatives": ["PostgreSQL", "PostgreSQL with JSONB"]}
+  ]
+}

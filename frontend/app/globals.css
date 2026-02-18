@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Light / professional theme — enterprise SaaS aesthetic */
+
+  /* Backgrounds */
+  --bg-primary: #FFFFFF;
+  --bg-surface: #F6F8FA;
+  --bg-elevated: #FFFFFF;
+  --bg-hover: #EFF2F5;
+
+  /* Borders */
+  --border-default: #D0D7DE;
+  --border-muted: #E5EAF0;
+
+  /* Text */
+  --text-primary: #1F2328;
+  --text-secondary: #656D76;
+  --text-muted: #9198A1;
+
+  /* Accents — slightly darkened for contrast on white */
+  --accent-blue: #0969DA;
+  --accent-purple: #8250DF;
+  --accent-green: #1A7F37;
+  --accent-amber: #9A6700;
+  --accent-red: #CF222E;
+  --accent-grey: #656D76;
+
+  --border-radius: 2px;
+}
+
+body {
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Scrollbar styling — subtle on light bg */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-surface);
+  border-left: 1px solid var(--border-default);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-blue);
+}
+
+/* Dot Grid Background Pattern — subtle on light bg */
+.dot-grid-bg {
+  background-image: radial-gradient(circle, var(--border-default) 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.5;
+}
+
+.sharp-corners {
+  border-radius: var(--border-radius);
+}
+
+/* Font utilities */
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}

@@ -1,0 +1,31 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# System dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv
+RUN pip install --no-cache-dir uv
+
+# Copy the repo metadata FIRST so package build can find README.md, etc.
+COPY pyproject.toml uv.lock README.md ./
+
+# Install Python dependencies
+RUN uv sync --no-dev
+
+# Copy backend source and data files
+COPY backend ./backend
+COPY data ./data
+
+ENV PYTHONUNBUFFERED=1
+ENV PORT=8000
+
+EXPOSE 8000
+
+CMD ["uv", "run", "uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+

@@ -1,0 +1,69 @@
+{
+  "test_cases": [
+    {
+      "id": "test-01",
+      "title": "Add Redis caching layer to Customer API",
+      "technology": "Redis 7.x (AWS ElastiCache)",
+      "reason": "Reduce database load and improve p95 latency from 800ms to <200ms. Current PostgreSQL queries are hitting 85% CPU during peak hours. Caching layer will reduce read load by ~70% based on read/write patterns analysis.",
+      "affected_services": ["customer-api", "order-service"],
+      "data_classification": "OFFICIAL",
+      "proposer": "Platform Team",
+      "expected_outcome": "APPROVE",
+      "test_notes": "Standard caching pattern for read-heavy API. Redis is on tech radar ADOPT tier. Clear performance justification with metrics. Data classification allows caching."
+    },
+    {
+      "id": "test-02",
+      "title": "Introduce GraphQL gateway for mobile clients",
+      "technology": "Apollo Server 4",
+      "reason": "Reduce over-fetching on mobile, improve app performance. Current REST endpoints return full objects, mobile only uses 30-40% of fields. GraphQL would reduce payload size by ~60% and allow flexible querying.",
+      "affected_services": ["mobile-bff", "customer-api", "order-service", "search-service"],
+      "data_classification": "OFFICIAL-SENSITIVE",
+      "proposer": "Mobile Team",
+      "expected_outcome": "APPROVE_WITH_CONDITIONS",
+      "test_notes": "Apollo Server is on tech radar TRIAL tier. Touches multiple services. Sensitive data requires careful field-level security. Should trigger conditions around: authentication/authorization at field level, query complexity limits, rate limiting, monitoring."
+    },
+    {
+      "id": "test-03",
+      "title": "Replace PostgreSQL with MongoDB for user profiles",
+      "technology": "MongoDB 7.0",
+      "reason": "More flexible schema for user preferences. Team wants to iterate faster on profile fields without migrations.",
+      "affected_services": ["customer-api", "auth-service", "billing-api"],
+      "data_classification": "OFFICIAL-SENSITIVE",
+      "proposer": "Backend Team",
+      "expected_outcome": "REJECT",
+      "test_notes": "Anti-pattern: wrong tool for the job. PostgreSQL jsonb handles flexible schemas well. User profiles are relational (link to orders, auth, billing). MongoDB not on tech radar for this use case. High-risk data migration. Should trigger RED flags from all specialists."
+    },
+    {
+      "id": "test-04",
+      "title": "Migrate CI/CD from GitHub Actions to Dagger",
+      "technology": "Dagger 0.9",
+      "reason": "Portable CI pipelines, better local testing. GitHub Actions runs are slow (8-12 min), difficult to test locally. Dagger promises same pipelines run locally and in CI.",
+      "affected_services": ["all"],
+      "data_classification": "PUBLIC",
+      "proposer": "DevOps Team",
+      "expected_outcome": "DEFER",
+      "test_notes": "Dagger is new/cutting-edge, likely in ASSESS tier or not on tech radar. Impacts all services. Non-trivial migration effort. Team capability question: does DevOps have Dagger expertise? Should trigger DEFER: 'Pilot with 2-3 services first, prove value, then revisit.'"
+    },
+    {
+      "id": "test-05",
+      "title": "Add Effect-TS for error handling in billing service",
+      "technology": "Effect-TS 3.0",
+      "reason": "Type-safe error handling, better composability than try/catch. Billing logic has complex error paths (payment gateway failures, validation errors, retries). Effect-TS provides algebraic effects for managing these systematically.",
+      "affected_services": ["billing-api"],
+      "proposer": "Billing Team",
+      "expected_outcome": "DEFER",
+      "test_notes": "Effect-TS is cutting-edge, likely not on tech radar. Steep learning curve. Single service impact. Should trigger: 'Interesting but unproven in our context. Pilot in non-critical path, assess team learning curve, revisit in Q2.'"
+    }
+  ],
+  "metadata": {
+    "created": "2026-02-16",
+    "purpose": "End-to-end testing for Architecture Council Sprint 5",
+    "coverage": [
+      "Standard APPROVE case (proven tech, clear metrics)",
+      "APPROVE_WITH_CONDITIONS (trial tech, multi-service, sensitive data)",
+      "Hard REJECT (anti-pattern, wrong tool, risky)",
+      "DEFER (too new/unproven, all services impact)",
+      "DEFER (niche tech, team capability question)"
+    ]
+  }
+}

@@ -1,0 +1,45 @@
+[project]
+name = "architecture-council"
+version = "0.1.0"
+description = "AI-powered Software Architecture Design Authority using multi-LLM agents"
+readme = "README.md"
+authors = [
+    { name = "Justin Narracott", url = "https://github.com/JustinNarracott" },
+]
+license = { text = "MIT" }
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "crewai[google-genai]>=0.80.0",
+    "crewai-tools>=0.14.0",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "pydantic>=2.0.0",
+    "anthropic>=0.34.0",
+    "sse-starlette>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "litellm>=1.0.0",
+    "openai>=1.0.0",
+    "requests>=2.31.0",
+    "gitpython>=3.1.0",
+    "chromadb>=0.5.0",
+    "pyyaml>=6.0.0",
+    "apscheduler>=3.10.0",
+    "email-validator>=2.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "httpx>=0.27.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["backend"]
+
+[project.scripts]
+architecture-council = "backend.main:main"

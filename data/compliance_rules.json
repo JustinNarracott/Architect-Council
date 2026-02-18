@@ -1,0 +1,91 @@
+{
+  "rules": [
+    {
+      "rule_id": "DATA-001",
+      "title": "PII Data Encryption in Transit",
+      "description": "All PII data must be encrypted in transit using TLS 1.2+",
+      "applies_to_data": ["PII", "RESTRICTED"],
+      "required_actions": ["Enable TLS 1.2+ for all API endpoints", "Verify certificate validity", "Implement HSTS headers"]
+    },
+    {
+      "rule_id": "DATA-002",
+      "title": "PII Data Encryption at Rest",
+      "description": "All PII data must be encrypted at rest using AES-256 or equivalent",
+      "applies_to_data": ["PII", "RESTRICTED"],
+      "required_actions": ["Enable database encryption", "Implement application-level encryption for sensitive fields", "Secure key management using KMS/HSM"]
+    },
+    {
+      "rule_id": "DATA-003",
+      "title": "Data Residency Requirements",
+      "description": "Customer PII must be stored in approved geographic regions",
+      "applies_to_data": ["PII"],
+      "applies_to_deployment": ["aws", "azure", "gcp", "saas"],
+      "required_actions": ["Verify data center locations", "Document data flows", "Obtain legal approval for cross-border transfers"]
+    },
+    {
+      "rule_id": "THIRD-PARTY-001",
+      "title": "Third-Party SaaS Assessment",
+      "description": "External SaaS handling OFFICIAL or PII data requires security assessment",
+      "applies_to_deployment": ["saas"],
+      "applies_to_data": ["PII", "CONFIDENTIAL", "RESTRICTED"],
+      "required_actions": ["Complete vendor security questionnaire", "Review SOC 2 Type II report", "Conduct Data Protection Impact Assessment (DPIA)", "Document in vendor register"]
+    },
+    {
+      "rule_id": "THIRD-PARTY-002",
+      "title": "Vendor Lock-in Assessment",
+      "description": "Evaluate migration path and exit strategy for third-party dependencies",
+      "applies_to_deployment": ["saas"],
+      "required_actions": ["Document data export mechanisms", "Assess migration effort", "Identify alternative vendors"]
+    },
+    {
+      "rule_id": "AUTH-001",
+      "title": "Authentication Standard",
+      "description": "All services must implement OAuth 2.0 or SAML 2.0 for authentication",
+      "applies_to_technology": ["API", "service", "web application"],
+      "required_actions": ["Integrate with central auth service", "Implement token validation", "Support SSO where applicable"]
+    },
+    {
+      "rule_id": "AUTH-002",
+      "title": "Multi-Factor Authentication",
+      "description": "Services handling PII or RESTRICTED data must support MFA",
+      "applies_to_data": ["PII", "RESTRICTED"],
+      "required_actions": ["Implement MFA challenge flow", "Support TOTP or hardware tokens", "Enforce MFA for privileged accounts"]
+    },
+    {
+      "rule_id": "AUDIT-001",
+      "title": "Audit Logging Requirements",
+      "description": "All access to PII and RESTRICTED data must be logged",
+      "applies_to_data": ["PII", "RESTRICTED"],
+      "required_actions": ["Log all read/write operations with user identity", "Retain logs for minimum 1 year", "Implement tamper-proof log storage", "Enable log monitoring and alerting"]
+    },
+    {
+      "rule_id": "AUDIT-002",
+      "title": "Security Event Logging",
+      "description": "Security events must be logged to centralized SIEM",
+      "applies_to_data": ["ALL"],
+      "required_actions": ["Log authentication events", "Log authorization failures", "Log configuration changes", "Send logs to central SIEM"]
+    },
+    {
+      "rule_id": "NETWORK-001",
+      "title": "Network Segmentation",
+      "description": "Services must be deployed in appropriate network zones based on data classification",
+      "applies_to_deployment": ["on-premise", "aws", "azure", "gcp"],
+      "applies_to_data": ["CONFIDENTIAL", "RESTRICTED"],
+      "required_actions": ["Deploy in DMZ or private subnet", "Implement network ACLs", "Restrict egress traffic"]
+    },
+    {
+      "rule_id": "BACKUP-001",
+      "title": "Backup and Recovery",
+      "description": "Critical data must be backed up with tested recovery procedures",
+      "applies_to_data": ["PII", "CONFIDENTIAL", "RESTRICTED"],
+      "required_actions": ["Implement automated backups (RPO < 24hrs)", "Test recovery procedures quarterly", "Encrypt backup data", "Store backups in separate region/zone"]
+    },
+    {
+      "rule_id": "VULN-001",
+      "title": "Vulnerability Management",
+      "description": "All services must undergo regular vulnerability scanning",
+      "applies_to_data": ["ALL"],
+      "required_actions": ["Run automated vulnerability scans weekly", "Patch critical vulnerabilities within 7 days", "Patch high vulnerabilities within 30 days", "Document exception process"]
+    }
+  ]
+}
