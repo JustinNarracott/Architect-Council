@@ -70,3 +70,57 @@ export interface ArchitectureRuling {
 
 // Backward compat alias — remove once ResultsPanel is updated
 export type ConsensusReport = ArchitectureRuling;
+
+// ── Codebase Review types ─────────────────────────────────────────────────────
+
+export interface CodebaseRequest {
+  repo_url?: string;
+  local_path?: string;
+  auth_token?: string;
+  branch?: string;
+}
+
+export interface CodebaseAnalysisResponse {
+  analysis_id: string;
+  stream_url: string;
+  status: string;
+}
+
+export type FindingSeverity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+
+export interface Finding {
+  id: string;
+  title: string;
+  severity: FindingSeverity;
+  agent_source: string;
+  description: string;
+  evidence?: FindingEvidence[];
+  recommendation: string;
+}
+
+export interface FindingEvidence {
+  file: string;
+  line?: number;
+  snippet?: string;
+}
+
+export interface RepoMetadata {
+  repo_url: string;
+  branch: string;
+  structure_summary: string;
+  language_breakdown: Record<string, number>;
+  dependency_count: number;
+  file_count: number;
+  key_files: string[];
+}
+
+export interface CodebaseRuling {
+  analysis_id: string;
+  repo_url: string;
+  timestamp: string;
+  overall_score: number;
+  findings: Finding[];
+  repo_metadata?: RepoMetadata;
+  summary: string;
+  priority_actions: string[];
+}
