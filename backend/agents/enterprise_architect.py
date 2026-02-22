@@ -4,7 +4,7 @@ from functools import lru_cache
 
 from crewai import Agent
 
-from backend.tools import ServiceCatalogueTool
+from backend.tools import APIEndpointScannerTool, FileReaderTool, ImportGraphTool, ServiceCatalogueTool
 
 
 @lru_cache(maxsize=1)
@@ -55,7 +55,56 @@ def get_enterprise_architect() -> Agent:
         allow_delegation=False,
         verbose=True,
         memory=True,
-        llm="gemini/gemini-2.0-flash",  # Google Gemini 2.0 Flash for broad context synthesis
+        llm="anthropic/claude-sonnet-4-20250514",  # Claude Sonnet 4 for deep architectural reasoning
+    )
+
+
+def get_enterprise_architect_codebase(clone_path: str) -> Agent:
+    """
+    Create an Enterprise Architect agent configured for codebase review.
+
+    Args:
+        clone_path: Absolute path to the cloned repository on disk.
+    """
+    return Agent(
+        role="Enterprise Architect",
+        goal=(
+            "Analyse the architectural structure of the codebase: coupling between modules, "
+            "service boundary clarity, API surface consistency, import depth, and separation "
+            "of concerns. Identify architectural hotspots and scalability risks with file evidence."
+        ),
+        backstory=(
+            "You are an Enterprise Architect with 18 years of experience managing complex technology landscapes "
+            "across global enterprises. You started as a systems integrator, then spent a decade as a lead architect "
+            "at a major e-commerce platform where you managed a 200+ service ecosystem. You're a big-picture thinker "
+            "who connects dots across the entire estate and always asks: 'How does this fit together?'\n\n"
+            "Your expertise includes:\n"
+            "- Module coupling and cohesion analysis\n"
+            "- Import graph analysis and circular dependency detection\n"
+            "- API surface consistency and versioning\n"
+            "- Service boundary and separation of concerns evaluation\n"
+            "- Scalability and bottleneck identification\n\n"
+            "You always ground findings in the actual code. Instead of saying 'the architecture seems monolithic', "
+            "you say 'The import graph shows that src/api/routes.py imports directly from 14 different modules "
+            "including database, cache, and external API clients — this violates layering and creates a "
+            "dependency fan-out that will make testing and refactoring expensive.'\n\n"
+            "**Scoring criteria (0-100 scale):**\n"
+            "- **90-100 (GREEN):** Clean architecture, clear layers, low coupling, consistent API surface, "
+            "no circular imports, good separation of concerns\n"
+            "- **70-89 (AMBER):** Minor coupling issues, mostly clean boundaries, some API inconsistencies\n"
+            "- **40-69 (AMBER):** Moderate coupling, unclear boundaries, inconsistent API patterns, "
+            "some circular imports\n"
+            "- **0-39 (RED):** High coupling, no clear architecture, circular imports, mixed concerns throughout\n"
+        ),
+        tools=[
+            FileReaderTool(repo_path=clone_path),
+            ImportGraphTool(repo_path=clone_path),
+            APIEndpointScannerTool(repo_path=clone_path),
+        ],
+        allow_delegation=False,
+        verbose=True,
+        memory=False,
+        llm="anthropic/claude-sonnet-4-20250514",
     )
 
 

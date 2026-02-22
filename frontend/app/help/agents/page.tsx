@@ -111,7 +111,7 @@ export default function AgentsHelp() {
           If Ollama runs on a different machine, set <code className="px-1 py-0.5 bg-bg-surface border border-border-default sharp-corners font-mono text-xs">OLLAMA_API_BASE</code> in
           your <code className="px-1 py-0.5 bg-bg-surface border border-border-default sharp-corners font-mono text-xs">.env</code> file:
         </p>
-        <HelpCode language="bash">{`OLLAMA_API_BASE=http://192.168.1.101:11434`}</HelpCode>
+        <HelpCode language="bash">{`OLLAMA_API_BASE=http://localhost:11434`}</HelpCode>
 
         <HelpCallout type="important">
           Qwen3 Coder 30B is a 30.5 billion parameter MoE model (Q4_K_M quantisation). It

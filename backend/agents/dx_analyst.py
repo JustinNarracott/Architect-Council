@@ -4,12 +4,16 @@ from functools import lru_cache
 
 from crewai import Agent
 
-from backend.tools import WebResearchTool, DependencyCheckTool
-
 
 @lru_cache(maxsize=1)
 def get_dx_analyst() -> Agent:
-    """Get or create the DX Analyst agent (cached)."""
+    """Get or create the DX Analyst agent (cached).
+
+    NOTE: No tools assigned. Perplexity sonar-pro has built-in web search
+    and does NOT support OpenAI-style function/tool calling. Passing tools
+    causes litellm to inject assistant messages with content=null during the
+    tool-call cycle, which Perplexity's API rejects as 'Message content was empty'.
+    """
     return Agent(
         role="Developer Experience Analyst",
         goal=(
@@ -50,11 +54,60 @@ def get_dx_analyst() -> Agent:
             "from adopting a 'cutting-edge' framework that had zero documentation and a maintainer who hadn't "
             "committed in 8 months—your research prevented what would have been a $2M rewrite 18 months later."
         ),
-        tools=[WebResearchTool(), DependencyCheckTool()],
+        tools=[],  # No tools — Perplexity sonar-pro has built-in web search
         allow_delegation=False,
         verbose=True,
         memory=False,  # Perplexity is strict — memory injects extra messages that can be empty
         llm="perplexity/sonar-pro",  # Perplexity Sonar for real-time web search capability
+    )
+
+
+def get_dx_analyst_codebase(clone_path: str) -> Agent:  # noqa: ARG001
+    """
+    Create a DX Analyst agent configured for codebase review.
+
+    The clone_path parameter is accepted for API consistency but is NOT used
+    to attach tools — Perplexity sonar-pro does not support function calling.
+    Repo metadata must be injected directly into the task description instead.
+
+    Args:
+        clone_path: Accepted for API consistency; not used to attach tools.
+    """
+    return Agent(
+        role="Developer Experience Analyst",
+        goal=(
+            "Evaluate the developer experience of the codebase: README quality, documentation "
+            "coverage, test presence, onboarding complexity, and community health signals. "
+            "Base all findings on the repository metadata provided in the task description."
+        ),
+        backstory=(
+            "You are a Developer Experience Analyst with 10 years of experience bridging the gap between "
+            "architecture ideals and team reality. You started as a developer advocate at a major tech company, "
+            "then moved into platform engineering where you witnessed firsthand the cost of adopting technologies "
+            "teams couldn't effectively use. You're pragmatic, team-focused, and always ask: 'Can our devs "
+            "actually use this?'\n\n"
+            "Your expertise includes:\n"
+            "- README and documentation quality evaluation\n"
+            "- Test coverage signal analysis\n"
+            "- Onboarding complexity assessment\n"
+            "- Community health indicators (changelog, contributing guide, CI/CD)\n"
+            "- Developer tooling presence (pre-commit hooks, task runners, make targets)\n\n"
+            "You work from the repository metadata provided — you do not call external tools. "
+            "You make concrete, evidence-grounded assessments. Instead of saying 'documentation seems sparse', "
+            "you say 'No docs/ directory detected. README is present but contains no installation steps or "
+            "contribution guide. Zero test files found across 47 source files — 0% test file ratio.'\n\n"
+            "**Scoring criteria (0-100 scale):**\n"
+            "- **90-100 (GREEN):** Excellent README, rich docs, high test presence, easy local setup, "
+            "active community signals, developer tooling enforced\n"
+            "- **70-89 (AMBER):** Good README, some docs, reasonable test presence, setup possible with effort\n"
+            "- **40-69 (AMBER):** Sparse docs, minimal tests, complex or undocumented setup\n"
+            "- **0-39 (RED):** No README, no docs, no tests, setup impossible without tribal knowledge\n"
+        ),
+        tools=[],  # MUST remain empty — Perplexity sonar-pro rejects function calling
+        allow_delegation=False,
+        verbose=True,
+        memory=False,  # Perplexity is strict — memory injects extra messages that can be empty
+        llm="perplexity/sonar-pro",
     )
 
 

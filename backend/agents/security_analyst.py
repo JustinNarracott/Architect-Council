@@ -12,14 +12,11 @@ from backend.tools import (
     SecretScannerTool,
 )
 
-# Ollama local model for security analysis — code never leaves the network
-_ollama_base_url = os.getenv("OLLAMA_API_BASE", "http://192.168.1.101:11434")
-
+# Claude Haiku — fast, reliable, capable for security analysis
 _security_llm = LLM(
-    model="ollama_chat/qwen3-coder:30b",
-    base_url=_ollama_base_url,
-    api_key="not-needed",
-    timeout=300,
+    model="anthropic/claude-haiku-4-5-20251001",
+    api_key=os.getenv("ANTHROPIC_API_KEY"),
+    timeout=120,
 )
 
 

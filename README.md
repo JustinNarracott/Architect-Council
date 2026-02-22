@@ -204,6 +204,7 @@ architecture-council/
 ├── .env.example          # Environment template
 ├── pyproject.toml        # Python dependencies
 ├── CONTRIBUTING.md       # Contribution guidelines
+├── CLAUDE.md             # Scope control
 └── README.md
 ```
 
