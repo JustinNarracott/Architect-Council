@@ -59,7 +59,7 @@ class ComplianceCheckTool(BaseTool):
             technology_lower = technology.lower() if technology else ""
             deployment_lower = deployment_target.lower() if deployment_target else ""
 
-            result = f"Compliance Check\n"
+            result = "Compliance Check\n"
             result += "=" * 60 + "\n"
             result += f"Data Classification: {data_classification}\n"
             if technology:
@@ -147,7 +147,7 @@ class ComplianceCheckTool(BaseTool):
                     result += f"   Status: {status}\n"
                     result += f"   Description: {rule['description']}\n"
                     if rule.get('required_actions'):
-                        result += f"   Required Actions:\n"
+                        result += "   Required Actions:\n"
                         for action in rule['required_actions']:
                             result += f"     - {action}\n"
                     result += "\n"

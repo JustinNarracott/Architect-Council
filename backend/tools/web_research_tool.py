@@ -50,7 +50,7 @@ class WebResearchTool(BaseTool):
                     + "For MVP: Perform manual research using:\n"
                     + "  - GitHub: github.com/{technology_name}\n"
                     + f"  - Stack Overflow: stackoverflow.com/search?q={technology_name}\n"
-                    + f"  - Google Trends: trends.google.com\n"
+                    + "  - Google Trends: trends.google.com\n"
                 )
 
             # Build research query based on type

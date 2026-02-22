@@ -1,6 +1,8 @@
 """Repository cloning utilities for codebase analysis."""
 
+import os
 import shutil
+import stat
 import tempfile
 from pathlib import Path
 from typing import Optional
@@ -141,7 +143,12 @@ class RepoCloner:
         """
         if self.clone_path and self.clone_path.exists():
             try:
-                shutil.rmtree(self.clone_path)
+                def _force_remove(func, path, _excinfo):
+                    """Force-remove read-only files (e.g. .git pack files on Windows)."""
+                    os.chmod(path, stat.S_IWRITE)
+                    func(path)
+
+                shutil.rmtree(self.clone_path, onerror=_force_remove)
                 self.clone_path = None
                 self._repo = None
             except Exception as e:

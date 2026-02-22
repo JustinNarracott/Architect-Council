@@ -2,7 +2,7 @@
 
 import os
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Type
 
@@ -148,7 +148,7 @@ class SecretScannerTool(BaseTool):
                 "Secret Scan Report",
                 "=" * 60,
                 "",
-                f"GITIGNORE CHECK",
+                "GITIGNORE CHECK",
                 "-" * 40,
             ]
             lines += gitignore_status

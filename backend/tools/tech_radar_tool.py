@@ -51,12 +51,12 @@ class TechRadarTool(BaseTool):
                         result += f"Approved Since: {item.get('approved_since', 'N/A')}\n"
 
                         if item.get("conditions"):
-                            result += f"\nConditions:\n"
+                            result += "\nConditions:\n"
                             for condition in item["conditions"]:
                                 result += f"  - {condition}\n"
 
                         if item.get("alternatives"):
-                            result += f"\nAlternatives:\n"
+                            result += "\nAlternatives:\n"
                             for alt in item["alternatives"]:
                                 result += f"  - {alt}\n"
 

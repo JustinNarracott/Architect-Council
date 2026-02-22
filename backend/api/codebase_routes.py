@@ -7,8 +7,6 @@ from collections.abc import AsyncGenerator
 from datetime import datetime
 from pathlib import Path
 
-logger = logging.getLogger(__name__)
-
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 from pydantic import BaseModel, Field
 from sse_starlette.sse import EventSourceResponse
@@ -16,6 +14,8 @@ from sse_starlette.sse import EventSourceResponse
 from backend.crews.codebase_crew import ROLE_TO_AGENT_ID, create_codebase_crew
 from backend.indexer import IndexedRepo, index_local_repo, index_repo
 from backend.schemas import AgentMessage, AgentMessageType
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/codebase", tags=["codebase"])
 
