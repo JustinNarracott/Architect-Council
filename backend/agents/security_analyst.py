@@ -74,13 +74,19 @@ def get_security_analyst() -> Agent:
     )
 
 
-def get_security_analyst_codebase(clone_path: str) -> Agent:
+def get_security_analyst_codebase(clone_path: str, tools_disabled: bool = False) -> Agent:
     """
     Create a Security & Resilience Analyst agent configured for codebase review.
 
     Args:
-        clone_path: Absolute path to the cloned repository on disk.
+        clone_path:     Absolute path to the cloned repository on disk.
+        tools_disabled: If True, agent gets no tools — scan results are pre-injected
+                        into the task description to avoid LLM tool-format issues.
     """
+    agent_tools = [] if tools_disabled else [
+        FileReaderTool(repo_path=clone_path),
+        SecretScannerTool(repo_path=clone_path),
+    ]
     return Agent(
         role="Security & Resilience Analyst",
         goal=(
@@ -114,18 +120,14 @@ def get_security_analyst_codebase(clone_path: str) -> Agent:
             "- **0-39 (RED):** CRITICAL issues — hardcoded secrets, known-vulnerable deps, no auth on "
             "sensitive endpoints, raw exception exposure, SQL/command injection risks\n"
         ),
-        tools=[
-            FileReaderTool(repo_path=clone_path),
-            SecretScannerTool(repo_path=clone_path),
-        ],
+        tools=agent_tools,
         allow_delegation=False,
         verbose=False,
         memory=False,
-        use_system_prompt=False,  # Forces ReAct text format — Haiku native tool-use breaks CrewAI parser
-        max_retry_limit=3,
         llm=_security_llm,
     )
 
 
 # For backwards compatibility
 security_analyst = None  # Will be created on first use
+
