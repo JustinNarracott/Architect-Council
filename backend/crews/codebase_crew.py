@@ -21,6 +21,7 @@ from backend.governance.formatter import (
     format_for_chair,
 )
 from backend.indexer import IndexedRepo
+from backend.tools import FileReaderTool, SecretScannerTool
 
 # Map agent roles to frontend agent IDs (same as ADR crew)
 ROLE_TO_AGENT_ID = {
@@ -30,6 +31,39 @@ ROLE_TO_AGENT_ID = {
     "Security & Resilience Analyst": "security_analyst",
     "Design Authority Chair": "da_chair",
 }
+
+
+def _pre_run_security_tools(clone_path: str) -> str:
+    """
+    Run SecretScannerTool and sample FileReaderTool before the crew starts.
+
+    Results are injected into the security task description so Perplexity can
+    reason over concrete scan output + apply live CVE knowledge without needing
+    to call tools itself (Perplexity rejects function calling).
+    """
+    sections = []
+
+    try:
+        scanner = SecretScannerTool(repo_path=clone_path)
+        result = scanner._run(include_low=True)
+        sections.append(f"### Secret Scanner Output\n\n{result}")
+    except Exception as e:
+        sections.append(f"### Secret Scanner Output\n\nError: {e}")
+
+    try:
+        reader = FileReaderTool(repo_path=clone_path)
+        for target in ["auth", "middleware", "security", "config", "cors", "routes"]:
+            try:
+                content = reader._run(path=target, max_lines=100)
+                if content and "not found" not in content.lower():
+                    sections.append(f"### File Sample: {target}\n\n{content}")
+                    break
+            except Exception:
+                continue
+    except Exception as e:
+        sections.append(f"### File Reader\n\nError: {e}")
+
+    return "\n\n".join(sections) or "No pre-run tool output available."
 
 
 def _format_repo_metadata(repo: IndexedRepo) -> str:
@@ -84,8 +118,11 @@ def create_codebase_crew(
     # Shared context injected into every task
     meta = _format_repo_metadata(repo_metadata)
 
-    # Load governance config once — empty config = graceful degradation (no change in behaviour)
+    # Load governance config once
     governance = load_governance()
+
+    # Pre-run security tools — Perplexity can't call tools itself
+    security_scan_results = _pre_run_security_tools(clone_path)
 
     # ── Task 1: Standards Analysis ─────────────────────────────────────────────
     standards_task = Task(
@@ -305,23 +342,23 @@ def create_codebase_crew(
             f"Perform a security review of the codebase at '{repo_url}'.\n\n"
             f"## Repository Metadata\n{meta}\n\n"
             f"{format_for_security(governance)}\n"
-            "Your analysis must include:\n"
-            "1. **Secrets scan** — Use the secret scanner to find hardcoded credentials, API keys, "
-            "tokens, or connection strings. Check .gitignore for proper .env exclusion.\n"
-            "2. **Vulnerable dependencies** — Are any dependencies known to be vulnerable? "
-            "Are there outdated packages with published CVEs?\n"
-            "3. **Authentication patterns** — Is there auth middleware? Is it applied consistently? "
-            "Is session/token handling sound?\n"
-            "4. **Error handling** — Are errors handled gracefully? Are stack traces exposed in "
-            "responses? Is sensitive information logged?\n"
-            "5. **Input validation** — Is user input validated? Are there obvious injection risks "
-            "(SQL, command, path traversal)?\n"
-            "6. **Data handling** — Is sensitive data encrypted at rest/transit? Are there "
-            "clear data classification patterns in the code?\n"
-            "7. **Security configuration** — Are there security headers? CORS configured correctly? "
-            "Rate limiting in place?\n\n"
-            "Use your tools to scan for secrets and read authentication/middleware code. "
-            "Cite specific files and line numbers for every finding.\n\n"
+            f"## Pre-Run Tool Results\n\n"
+            f"The following results were produced by running SecretScannerTool and FileReaderTool "
+            f"against the cloned repository. Use these as your primary evidence base, then apply "
+            f"your live CVE and vulnerability knowledge to assess severity and remediation.\n\n"
+            f"{security_scan_results}\n\n"
+            "## Your Analysis Must Include:\n"
+            "## Your Analysis Must Include:\n"
+            "1. **Secrets scan** — Reference the pre-run scanner output above. List every finding "
+            "with file, line, and severity. State explicitly if no secrets were found.\n"
+            "2. **Vulnerable dependencies** — Cross-reference the dependency list against your live "
+            "CVE knowledge. Flag any packages with known vulnerabilities and their CVE IDs.\n"
+            "3. **Authentication patterns** — From the file samples above, assess auth middleware "
+            "presence, consistency of application, and token/session handling.\n"
+            "4. **Error handling** — Are stack traces exposed in responses? Is sensitive info logged?\n"
+            "5. **Input validation** — Are there obvious injection risks (SQL, command, path traversal)?\n"
+            "6. **Security configuration** — CORS policy, security headers, rate limiting.\n\n"
+            "Cite specific files and line numbers from the pre-run results for every finding.\n\n"
             "Conclude with a score (0-100) where 100 = no security concerns identified."
         ),
         expected_output=(

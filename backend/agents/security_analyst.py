@@ -1,6 +1,5 @@
 """Security & Resilience Analyst agent - Security and operational risk specialist."""
 
-import os
 from functools import lru_cache
 
 from crewai import Agent
@@ -12,9 +11,13 @@ from backend.tools import (
     SecretScannerTool,
 )
 
-# Claude Sonnet — required for reliable tool-calling in CrewAI's ReAct loop.
-# Haiku via anthropic/ prefix emits native tool-use XML that CrewAI can't parse.
-_SECURITY_LLM = "anthropic/claude-sonnet-4-20250514"
+# Claude Sonnet — ADR review uses tools so needs a model that handles ReAct tool-calling.
+_ADR_SECURITY_LLM = "anthropic/claude-sonnet-4-20250514"
+
+# Perplexity — codebase review pre-runs tools in Python and injects results into the task.
+# Perplexity brings live CVE/vulnerability knowledge on top of those injected scan results.
+# No tools passed to agent — Perplexity rejects OpenAI-style function calling.
+_CODEBASE_SECURITY_LLM = "perplexity/sonar-pro"
 
 
 @lru_cache(maxsize=1)
@@ -67,23 +70,29 @@ def get_security_analyst() -> Agent:
         allow_delegation=False,
         verbose=False,
         memory=True,
-        llm=_SECURITY_LLM,
+        llm=_ADR_SECURITY_LLM,
     )
 
 
-def get_security_analyst_codebase(clone_path: str) -> Agent:
+def get_security_analyst_codebase(clone_path: str) -> Agent:  # noqa: ARG001
     """
     Create a Security & Resilience Analyst agent configured for codebase review.
 
+    Tools are NOT attached — Perplexity sonar-pro rejects function calling.
+    Instead, SecretScannerTool and FileReaderTool are pre-run in Python by
+    create_codebase_crew() and their results injected into the task description.
+    Perplexity then applies live CVE and vulnerability knowledge on top.
+
     Args:
-        clone_path: Absolute path to the cloned repository on disk.
+        clone_path: Accepted for API consistency; tools pre-run in crew, not here.
     """
     return Agent(
         role="Security & Resilience Analyst",
         goal=(
-            "Perform a security review of the codebase: scan for hardcoded secrets, identify "
-            "vulnerable dependencies, assess authentication patterns, error handling, input "
-            "validation, and security configuration. Report findings with file-level evidence."
+            "Perform a security review of the codebase using the pre-run tool results provided "
+            "in the task description. Identify secrets, vulnerable dependencies, weak auth patterns, "
+            "error handling issues, and input validation gaps. Use your live knowledge of CVEs and "
+            "vulnerability databases to assess severity and provide up-to-date remediation guidance."
         ),
         backstory=(
             "You are a Security & Resilience Analyst with 14 years of experience spanning penetration testing, "
@@ -93,14 +102,15 @@ def get_security_analyst_codebase(clone_path: str) -> Agent:
             "others miss. You always ask: 'What's the worst that could happen?'\n\n"
             "Your expertise includes:\n"
             "- Secret detection and credential hygiene\n"
-            "- Dependency vulnerability assessment\n"
+            "- Dependency vulnerability assessment with live CVE lookup\n"
             "- Authentication and authorization code review\n"
             "- Error handling and information leakage analysis\n"
             "- Input validation and injection risk assessment\n"
             "- Security headers and CORS configuration review\n\n"
-            "You always cite specific files and line numbers. You never say 'there may be security risks'—instead "
-            "you say 'backend/config.py line 23 contains a hardcoded AWS_SECRET_KEY. This is a CRITICAL finding — "
-            "this credential must be rotated immediately and moved to environment variables or a secrets manager.'\n\n"
+            "You work from pre-run scan results provided in the task description. You enrich those findings "
+            "with your live knowledge of current CVEs, known exploit patterns, and up-to-date remediation "
+            "guidance. You cite specific files and line numbers from the scan results. You never say "
+            "'there may be security risks' — you say exactly what was found, where, and how bad it is.\n\n"
             "**Scoring criteria (0-100 scale):**\n"
             "- **90-100 (GREEN):** No secrets found, deps up-to-date, robust auth, good error handling, "
             "input validation present, security headers configured\n"
@@ -108,17 +118,14 @@ def get_security_analyst_codebase(clone_path: str) -> Agent:
             "input validation in non-critical paths\n"
             "- **40-69 (AMBER):** Moderate concerns — outdated/vulnerable deps, weak auth patterns, "
             "missing validation in key endpoints, CORS too permissive\n"
-            "- **0-39 (RED):** CRITICAL issues — hardcoded secrets, known-vulnerable deps, no auth on "
-            "sensitive endpoints, raw exception exposure, SQL/command injection risks\n"
+            "- **0-39 (RED):** CRITICAL issues — hardcoded secrets, known-vulnerable deps with active CVEs, "
+            "no auth on sensitive endpoints, raw exception exposure, SQL/command injection risks\n"
         ),
-        tools=[
-            FileReaderTool(repo_path=clone_path),
-            SecretScannerTool(repo_path=clone_path),
-        ],
+        tools=[],  # MUST remain empty — Perplexity sonar-pro rejects function calling
         allow_delegation=False,
         verbose=False,
-        memory=False,
-        llm=_SECURITY_LLM,
+        memory=False,  # Perplexity strict — memory injects empty messages it rejects
+        llm=_CODEBASE_SECURITY_LLM,
     )
 
 
