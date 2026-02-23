@@ -7,8 +7,6 @@ from crewai import Agent
 from backend.tools import (
     ComplianceCheckTool,
     DependencyCheckTool,
-    FileReaderTool,
-    SecretScannerTool,
 )
 
 # Claude Sonnet — ADR review uses tools so needs a model that handles ReAct tool-calling.
