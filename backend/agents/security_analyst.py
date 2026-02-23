@@ -3,7 +3,7 @@
 import os
 from functools import lru_cache
 
-from crewai import Agent, LLM
+from crewai import Agent
 
 from backend.tools import (
     ComplianceCheckTool,
@@ -12,12 +12,9 @@ from backend.tools import (
     SecretScannerTool,
 )
 
-# Claude Haiku — fast, reliable, capable for security analysis
-_security_llm = LLM(
-    model="anthropic/claude-haiku-4-5-20251001",
-    api_key=os.getenv("ANTHROPIC_API_KEY"),
-    timeout=120,
-)
+# Claude Sonnet — required for reliable tool-calling in CrewAI's ReAct loop.
+# Haiku via anthropic/ prefix emits native tool-use XML that CrewAI can't parse.
+_SECURITY_LLM = "anthropic/claude-sonnet-4-20250514"
 
 
 @lru_cache(maxsize=1)
@@ -70,23 +67,17 @@ def get_security_analyst() -> Agent:
         allow_delegation=False,
         verbose=False,
         memory=True,
-        llm=_security_llm,
+        llm=_SECURITY_LLM,
     )
 
 
-def get_security_analyst_codebase(clone_path: str, tools_disabled: bool = False) -> Agent:
+def get_security_analyst_codebase(clone_path: str) -> Agent:
     """
     Create a Security & Resilience Analyst agent configured for codebase review.
 
     Args:
-        clone_path:     Absolute path to the cloned repository on disk.
-        tools_disabled: If True, agent gets no tools — scan results are pre-injected
-                        into the task description to avoid LLM tool-format issues.
+        clone_path: Absolute path to the cloned repository on disk.
     """
-    agent_tools = [] if tools_disabled else [
-        FileReaderTool(repo_path=clone_path),
-        SecretScannerTool(repo_path=clone_path),
-    ]
     return Agent(
         role="Security & Resilience Analyst",
         goal=(
@@ -120,11 +111,14 @@ def get_security_analyst_codebase(clone_path: str, tools_disabled: bool = False)
             "- **0-39 (RED):** CRITICAL issues — hardcoded secrets, known-vulnerable deps, no auth on "
             "sensitive endpoints, raw exception exposure, SQL/command injection risks\n"
         ),
-        tools=agent_tools,
+        tools=[
+            FileReaderTool(repo_path=clone_path),
+            SecretScannerTool(repo_path=clone_path),
+        ],
         allow_delegation=False,
         verbose=False,
         memory=False,
-        llm=_security_llm,
+        llm=_SECURITY_LLM,
     )
 
 

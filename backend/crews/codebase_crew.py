@@ -21,7 +21,6 @@ from backend.governance.formatter import (
     format_for_chair,
 )
 from backend.indexer import IndexedRepo
-from backend.tools import SecretScannerTool, FileReaderTool
 
 # Map agent roles to frontend agent IDs (same as ADR crew)
 ROLE_TO_AGENT_ID = {
@@ -31,39 +30,6 @@ ROLE_TO_AGENT_ID = {
     "Security & Resilience Analyst": "security_analyst",
     "Design Authority Chair": "da_chair",
 }
-
-
-def _run_security_tools(clone_path: str) -> str:
-    """
-    Pre-run SecretScannerTool and sample FileReaderTool before the crew starts.
-    Injects results directly into the security task description so the agent
-    needs no tool-calling capability — avoids LLM tool-format incompatibility.
-    """
-    results = []
-
-    # Secret scan
-    try:
-        scanner = SecretScannerTool(repo_path=clone_path)
-        scan_result = scanner._run(include_low=True)
-        results.append(f"## Pre-Run: Secret Scanner Results\n\n{scan_result}")
-    except Exception as e:
-        results.append(f"## Pre-Run: Secret Scanner Results\n\nError running scanner: {e}")
-
-    # Read key security-relevant files (auth, middleware, config)
-    try:
-        reader = FileReaderTool(repo_path=clone_path)
-        for target in ["auth", "middleware", "config", "security", "cors"]:
-            try:
-                content = reader._run(path=target, max_lines=80)
-                if content and "not found" not in content.lower():
-                    results.append(f"## Pre-Run: File Sample — {target}\n\n{content}")
-                    break  # one representative file is enough
-            except Exception:
-                continue
-    except Exception as e:
-        results.append(f"## Pre-Run: File Reader\n\nError: {e}")
-
-    return "\n\n".join(results) if results else "## Pre-Run: No tool results available."
 
 
 def _format_repo_metadata(repo: IndexedRepo) -> str:
@@ -112,10 +78,7 @@ def create_codebase_crew(
     standards_analyst = get_standards_analyst_codebase(clone_path)
     dx_analyst = get_dx_analyst_codebase(clone_path)
     enterprise_architect = get_enterprise_architect_codebase(clone_path)
-    # Pre-run security tools — inject results directly into task to avoid
-    # LLM tool-calling format incompatibility (Haiku emits raw XML)
-    security_tool_results = _run_security_tools(clone_path)
-    security_analyst = get_security_analyst_codebase(clone_path, tools_disabled=True)
+    security_analyst = get_security_analyst_codebase(clone_path)
     da_chair = get_da_chair_codebase()
 
     # Shared context injected into every task
@@ -342,9 +305,7 @@ def create_codebase_crew(
             f"Perform a security review of the codebase at '{repo_url}'.\n\n"
             f"## Repository Metadata\n{meta}\n\n"
             f"{format_for_security(governance)}\n"
-            f"## Tool Results (pre-run — do NOT call tools yourself)\n\n"
-            f"{security_tool_results}\n\n"
-            "Using the tool results above, your analysis must include:\n"
+            "Your analysis must include:\n"
             "1. **Secrets scan** — Use the secret scanner to find hardcoded credentials, API keys, "
             "tokens, or connection strings. Check .gitignore for proper .env exclusion.\n"
             "2. **Vulnerable dependencies** — Are any dependencies known to be vulnerable? "
