@@ -54,7 +54,7 @@ def get_da_chair() -> Agent:
         ),
         tools=[],  # DA Chair relies on other agents' outputs, no direct tools needed
         allow_delegation=True,  # Can delegate to specialist agents if needed
-        verbose=True,
+        verbose=False,
         memory=True,
         llm="gpt-5.1",  # GPT-5.1 for fast frontier-depth synthesis
     )
@@ -103,7 +103,7 @@ def get_da_chair_codebase() -> Agent:
         ),
         tools=[],  # DA Chair synthesises — no direct repo access needed
         allow_delegation=False,
-        verbose=True,
+        verbose=False,
         memory=False,
         llm="gpt-5.1",  # GPT-5.1 for fast frontier-depth synthesis
     )
@@ -111,3 +111,4 @@ def get_da_chair_codebase() -> Agent:
 
 # For backwards compatibility
 da_chair = None  # Will be created on first use
+

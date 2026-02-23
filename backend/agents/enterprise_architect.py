@@ -53,7 +53,7 @@ def get_enterprise_architect() -> Agent:
         ),
         tools=[ServiceCatalogueTool()],
         allow_delegation=False,
-        verbose=True,
+        verbose=False,
         memory=True,
         llm="anthropic/claude-sonnet-4-20250514",  # Claude Sonnet 4 for deep architectural reasoning
     )
@@ -102,7 +102,7 @@ def get_enterprise_architect_codebase(clone_path: str) -> Agent:
             APIEndpointScannerTool(repo_path=clone_path),
         ],
         allow_delegation=False,
-        verbose=True,
+        verbose=False,
         memory=False,
         llm="anthropic/claude-sonnet-4-20250514",
     )
@@ -110,3 +110,4 @@ def get_enterprise_architect_codebase(clone_path: str) -> Agent:
 
 # For backwards compatibility
 enterprise_architect = None  # Will be created on first use
+

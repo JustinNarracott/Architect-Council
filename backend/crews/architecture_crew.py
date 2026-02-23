@@ -414,7 +414,7 @@ def create_architecture_crew(
             ruling_task,
         ],
         process=Process.sequential,  # Sequential with async tasks = parallel specialists + synthesis
-        verbose=True,
+        verbose=False,
         memory=False,  # Disable memory to avoid additional LLM calls that may hit Perplexity
         planning=False,  # Disable planning — tasks have detailed descriptions; planning routes through
                          # all agent LLMs which causes Perplexity 'empty content' errors
@@ -465,3 +465,4 @@ def run_evaluation(
         }
     )
     return result.raw
+

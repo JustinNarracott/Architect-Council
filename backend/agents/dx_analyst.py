@@ -56,7 +56,7 @@ def get_dx_analyst() -> Agent:
         ),
         tools=[],  # No tools — Perplexity sonar-pro has built-in web search
         allow_delegation=False,
-        verbose=True,
+        verbose=False,
         memory=False,  # Perplexity is strict — memory injects extra messages that can be empty
         llm="perplexity/sonar-pro",  # Perplexity Sonar for real-time web search capability
     )
@@ -105,7 +105,7 @@ def get_dx_analyst_codebase(clone_path: str) -> Agent:  # noqa: ARG001
         ),
         tools=[],  # MUST remain empty — Perplexity sonar-pro rejects function calling
         allow_delegation=False,
-        verbose=True,
+        verbose=False,
         memory=False,  # Perplexity is strict — memory injects extra messages that can be empty
         llm="perplexity/sonar-pro",
     )
@@ -113,3 +113,4 @@ def get_dx_analyst_codebase(clone_path: str) -> Agent:  # noqa: ARG001
 
 # For backwards compatibility
 dx_analyst = None  # Will be created on first use
+

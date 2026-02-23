@@ -476,10 +476,11 @@ def create_codebase_crew(
             synthesis_task,
         ],
         process=Process.sequential,  # async tasks run in parallel; synthesis waits for all
-        verbose=True,
+        verbose=False,
         memory=False,
         planning=False,
         task_callback=task_callback,
     )
 
     return crew
+

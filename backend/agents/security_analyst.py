@@ -68,7 +68,7 @@ def get_security_analyst() -> Agent:
         ),
         tools=[ComplianceCheckTool(), DependencyCheckTool()],
         allow_delegation=False,
-        verbose=True,
+        verbose=False,
         memory=True,
         llm=_security_llm,
     )
@@ -119,7 +119,7 @@ def get_security_analyst_codebase(clone_path: str) -> Agent:
             SecretScannerTool(repo_path=clone_path),
         ],
         allow_delegation=False,
-        verbose=True,
+        verbose=False,
         memory=False,
         llm=_security_llm,
     )
@@ -127,3 +127,4 @@ def get_security_analyst_codebase(clone_path: str) -> Agent:
 
 # For backwards compatibility
 security_analyst = None  # Will be created on first use
+

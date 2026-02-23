@@ -54,7 +54,7 @@ def get_standards_analyst() -> Agent:
         ),
         tools=[TechRadarTool(), PatternCheckTool()],
         allow_delegation=False,
-        verbose=True,
+        verbose=False,
         memory=True,
         llm="gpt-4.1",  # OpenAI GPT-4.1 for structured pattern matching
     )
@@ -109,7 +109,7 @@ def get_standards_analyst_codebase(clone_path: str) -> Agent:
             StructureAnalyserTool(repo_path=clone_path),
         ],
         allow_delegation=False,
-        verbose=True,
+        verbose=False,
         memory=False,
         llm="gpt-4.1",
     )
@@ -117,3 +117,4 @@ def get_standards_analyst_codebase(clone_path: str) -> Agent:
 
 # For backwards compatibility
 standards_analyst = None  # Will be created on first use
+
