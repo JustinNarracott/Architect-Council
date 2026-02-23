@@ -121,10 +121,11 @@ def get_security_analyst_codebase(clone_path: str) -> Agent:
         allow_delegation=False,
         verbose=False,
         memory=False,
+        use_system_prompt=False,  # Forces ReAct text format — Haiku native tool-use breaks CrewAI parser
+        max_retry_limit=3,
         llm=_security_llm,
     )
 
 
 # For backwards compatibility
 security_analyst = None  # Will be created on first use
-
