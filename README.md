@@ -1,79 +1,113 @@
 # The Architecture Council
 
-An AI-powered Software Architecture Design Authority where specialized AI agents evaluate architecture decisions against organizational standards, producing scored Architecture Decision Records (ADRs) with reasoned rulings.
+An AI-powered Software Architecture Design Authority where specialised AI agents evaluate architecture decisions and codebases, producing scored reviews with reasoned rulings.
 
 ![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
 ![Next.js](https://img.shields.io/badge/Next.js-14-black)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
+![CI](https://github.com/JustinNarracott/Architect-Council/actions/workflows/ci.yml/badge.svg)
 
 ## Overview
 
-The Architecture Council creates a visual panel of AI agents, each powered by a different LLM and with distinct expertise, that analyze software architecture decisions and produce consensus-based rulings. Agents evaluate proposals against standards, community health, strategic alignment, and security implications, synthesizing diverse perspectives into actionable architecture guidance.
+The Architecture Council creates a visual panel of AI agents — each powered by a different LLM — that analyse software architecture decisions and codebases, producing consensus-based rulings. Agents evaluate proposals against standards, community health, strategic alignment, and security implications, synthesising diverse perspectives into actionable guidance.
 
 Like having a design authority board available 24/7 in under 60 seconds.
 
-### The Council Panel
+## Two Modes
 
-| Agent | LLM Provider | Role | Focus |
-|-------|--------------|------|-------|
-| **Standards Analyst** | OpenAI GPT-4o | Standards & Patterns Evaluator | Tech radar, design patterns, anti-patterns, API standards |
-| **DX Analyst** | Perplexity Sonar | Developer Experience Analyst | Learning curve, community health, documentation, hiring pool |
-| **Enterprise Architect** | Google Gemini 2.0 Flash | Integration & Strategy Analyst | Service integration, dependency analysis, strategic alignment |
-| **Security & Resilience Analyst** | Anthropic Claude Sonnet 4 | Security & Operational Risk Analyst | Threat surface, compliance, failure modes, blast radius |
-| **DA Chair** | Anthropic Claude Opus | Design Authority Chair | Evidence synthesis, conflict resolution, final ruling |
+### ADR Review
+Submit an Architecture Decision Record proposal. Four specialist agents evaluate in parallel, the DA Chair synthesises, and you get a structured APPROVED / CONDITIONAL / REJECTED / DEFERRED ruling with scored findings.
+
+### Codebase Review
+Point the council at any public GitHub repository. The system clones it, indexes it, and runs the full panel against the actual code — scanning for secrets, analysing imports, reviewing standards compliance, and assessing DX. Results are exported as a full markdown report.
+
+---
+
+## The Council Panel
+
+| Agent | LLM | Role | Notes |
+|-------|-----|------|-------|
+| **Standards Analyst** | OpenAI GPT-4.1 | Code structure, naming, dependency health, linting | Uses FileReader + PatternCheck tools |
+| **DX Analyst** | Perplexity Sonar Pro | README, docs, test coverage, onboarding friction | No tools — Perplexity has built-in web search; repo metadata injected into task |
+| **Enterprise Architect** | Anthropic Claude Sonnet 4 | Coupling, service boundaries, API surface, import depth | Uses FileReader, ImportGraph, APIScanner tools |
+| **Security & Resilience Analyst** | Perplexity Sonar Pro | Secrets, vulnerable deps, auth, error handling | Tools pre-run in Python; results + live CVE knowledge via Perplexity |
+| **DA Chair** | OpenAI GPT-4.1 | Evidence synthesis, conflict resolution, final ruling | Weighted scoring across all specialist reports |
+
+### Why different LLMs?
+
+Deliberate diversity — each LLM has different strengths:
+- **GPT-4.1**: Strong instruction-following, reliable structured output
+- **Perplexity Sonar Pro**: Live web search for real-time CVE lookups and community health data
+- **Claude Sonnet 4**: Deep reasoning for architectural and integration analysis
+
+### LLM Tool Compatibility Note
+
+Not all LLMs support tool calling in CrewAI's ReAct loop. Perplexity Sonar Pro rejects OpenAI-style function calling entirely. For agents using Perplexity, tools are pre-run in Python before the crew starts and results are injected directly into the task description — giving the agent full evidence without needing to call tools itself. This is intentional and documented in the agent source files.
+
+---
 
 ## Features
 
-- **Multi-LLM Diversity**: 5 different LLMs provide diverse perspectives on architecture decisions
+- **Multi-LLM Council**: 3 different LLM providers for genuine perspective diversity
 - **Real-time Streaming**: Watch agents deliberate via Server-Sent Events
-- **Parallel Evaluation**: Specialist agents execute in parallel for 3x faster reviews
-- **Structured Rulings**: Clear APPROVED/CONDITIONAL/REJECTED/DEFERRED outcomes with conditions
-- **Governance Trail**: Every ruling is traceable with full agent reasoning
-- **Modern UI**: Dev/DevOps aesthetic with circuit patterns and code-review styling
+- **Parallel Evaluation**: Specialist agents execute in parallel (sequential only for DA Chair synthesis)
+- **Codebase Review**: Clone any GitHub repo and run the full council against actual code
+- **Secret Scanning**: Pre-run secret scanner with file-level evidence injected into security analysis
+- **Live CVE Lookup**: Perplexity brings current vulnerability data to dependency assessments
+- **Governance Config**: Per-instance governance rules loaded at runtime
+- **Export**: Full markdown report export for every review
+- **Ask Questions**: Post-review Q&A against completed analysis
+- **Docker Support**: Full docker-compose setup for production deployment
+
+---
 
 ## Tech Stack
 
 ### Backend
-- **[CrewAI](https://www.crewai.com/)** - Multi-agent orchestration
-- **[FastAPI](https://fastapi.tiangolo.com/)** - REST API & SSE streaming
-- **Multiple LLMs** - OpenAI, Anthropic, Google, Perplexity
-- **Python 3.11+**
+- **[CrewAI](https://www.crewai.com/)** — Multi-agent orchestration
+- **[FastAPI](https://fastapi.tiangolo.com/)** — REST API & SSE streaming
+- **[LiteLLM](https://litellm.ai/)** — Unified LLM provider interface
+- **Python 3.11+** with [uv](https://github.com/astral-sh/uv)
 
 ### Frontend
-- **[Next.js 14](https://nextjs.org/)** - React framework
-- **[Tailwind CSS](https://tailwindcss.com/)** - Styling (dev/devops theme)
-- **[Framer Motion](https://www.framer.com/motion/)** - Animations
+- **[Next.js 14](https://nextjs.org/)** — React framework with App Router
+- **[Tailwind CSS](https://tailwindcss.com/)** — Dev/DevOps aesthetic
+- **[Framer Motion](https://www.framer.com/motion/)** — Agent panel animations
 - **TypeScript**
 
-### Architecture Tools
-- Tech Radar compliance checker
-- Design pattern library matcher
-- Service catalogue query
-- Compliance rules evaluator
-- Real-time web research (community health, adoption rates)
-- Dependency analysis
+### Tools (Codebase Review)
+- `FileReaderTool` — reads source files from the cloned repo
+- `SecretScannerTool` — scans for hardcoded credentials and key files
+- `ImportGraphTool` — analyses Python/JS import graphs and coupling
+- `APIEndpointScannerTool` — catalogues API routes and surface
+- `StructureAnalyserTool` — directory structure and language breakdown
+- `TestCoverageTool` — test file ratio and framework detection
+- `DependencyCheckTool` — dependency health and vulnerability signals
+- `ComplianceCheckTool` — governance rule evaluation
+
+---
 
 ## Quick Start
 
 ### Prerequisites
 
 - Python 3.11+
-- [uv](https://github.com/astral-sh/uv) (Python package manager)
-- [Bun](https://bun.sh/) (or npm/yarn)
-- **4 API keys** (see Configuration below)
+- [uv](https://github.com/astral-sh/uv)
+- [Bun](https://bun.sh/) (or npm)
+- API keys for OpenAI, Anthropic, and Perplexity
 
-### Installation
+### Local Development
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/JustinNarracott/architect-council.git
-   cd architect-council
+   git clone https://github.com/JustinNarracott/Architect-Council.git
+   cd Architect-Council
    ```
 
 2. **Set up environment variables**
    ```bash
    cp .env.example .env
-   # Edit .env and add ALL 4 API keys (see Configuration section)
+   # Fill in your API keys
    ```
 
 3. **Install backend dependencies**
@@ -83,77 +117,87 @@ Like having a design authority board available 24/7 in under 60 seconds.
 
 4. **Install frontend dependencies**
    ```bash
-   cd frontend
-   bun install
+   cd frontend && bun install
    ```
 
-### Running the Application
-
-1. **Start the backend** (from project root)
+5. **Start backend** (from project root)
    ```bash
    uv run architecture-council
+   # API available at http://localhost:8000
    ```
-   The API will be available at `http://localhost:8000`
 
-2. **Start the frontend** (in another terminal)
+6. **Start frontend** (separate terminal)
    ```bash
-   cd frontend
-   bun dev
+   cd frontend && bun dev
+   # UI available at http://localhost:3000
    ```
-   The UI will be available at `http://localhost:3000`
 
-3. **Open your browser** and navigate to `http://localhost:3000`
+### Docker (Recommended for Production)
+
+```bash
+cd docker
+docker compose up --build -d
+# Backend: http://localhost:8011
+# Frontend: http://localhost:3011
+```
+
+---
 
 ## Configuration
 
-### Backend Environment Variables
+### Required Environment Variables
 
-**IMPORTANT**: All 4 API keys are required for the council to function.
+| Variable | Description | Used By |
+|----------|-------------|---------|
+| `OPENAI_API_KEY` | OpenAI API key | Standards Analyst, DA Chair (GPT-4.1) |
+| `ANTHROPIC_API_KEY` | Anthropic API key | Enterprise Architect (Claude Sonnet 4) |
+| `PERPLEXITY_API_KEY` | Perplexity API key | DX Analyst, Security Analyst (Sonar Pro) |
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `OPENAI_API_KEY` | OpenAI API key (for Standards Analyst using GPT-4o) | **Yes** |
-| `ANTHROPIC_API_KEY` | Anthropic API key (for Security Analyst + DA Chair using Claude) | **Yes** |
-| `GOOGLE_API_KEY` | Google API key (for Enterprise Architect using Gemini 2.0) | **Yes** |
-| `PERPLEXITY_API_KEY` | Perplexity API key (for DX Analyst using Sonar) | **Yes** |
-| `HOST` | Backend host | No (default: `0.0.0.0`) |
-| `PORT` | Backend port | No (default: `8000`) |
-| `RELOAD` | Enable hot reload | No (default: `true`) |
+### Optional
 
-**Example `.env`:**
-```bash
-OPENAI_API_KEY=sk-...
-ANTHROPIC_API_KEY=sk-ant-...
-GOOGLE_API_KEY=...
-PERPLEXITY_API_KEY=pplx-...
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `HOST` | `0.0.0.0` | Backend host |
+| `PORT` | `8000` | Backend port |
+| `RELOAD` | `false` | Hot reload (dev only) |
 
-HOST=0.0.0.0
-PORT=8000
-RELOAD=true
-```
+> **Note:** Google/Gemini is no longer used. The Enterprise Architect was migrated to Claude Sonnet 4 for more reliable tool calling in CrewAI's ReAct loop.
 
-### Frontend Environment Variables
+---
 
-Create `frontend/.env.local` for frontend configuration:
+## API Reference
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `NEXT_PUBLIC_API_URL` | Backend API URL | No (default: `http://localhost:8000`) |
-
-## API Endpoints
+### ADR Review
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/` | API information |
 | `GET` | `/health` | Health check |
-| `GET` | `/api/panel` | List all council panel members |
-| `POST` | `/api/review` | Start architecture review for an ADR |
-| `GET` | `/api/stream/{id}` | SSE stream for review |
-| `GET` | `/api/rulings` | Past architecture rulings |
-| `GET` | `/api/review/{id}` | Get review result |
-| `GET` | `/api/tech-radar` | Get technology radar data |
+| `GET` | `/api/panel` | List council members and their LLMs |
+| `POST` | `/api/review` | Start ADR review |
+| `GET` | `/api/stream/{id}` | SSE stream for review progress |
+| `GET` | `/api/review/{id}` | Get completed review |
+| `GET` | `/api/rulings` | List past rulings |
 
-### Example: Start Architecture Review
+### Codebase Review
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/codebase/panel` | List codebase council members |
+| `POST` | `/api/codebase/analyse` | Start codebase review (GitHub URL or local path) |
+| `GET` | `/api/codebase/stream/{id}` | SSE stream for codebase review |
+| `GET` | `/api/codebase/review/{id}` | Get completed codebase review |
+
+### Example: Start Codebase Review
+
+```bash
+curl -X POST http://localhost:8000/api/codebase/analyse \
+  -H "Content-Type: application/json" \
+  -d '{
+    "repo_url": "https://github.com/your-org/your-repo.git"
+  }'
+```
+
+### Example: Start ADR Review
 
 ```bash
 curl -X POST http://localhost:8000/api/review \
@@ -168,124 +212,106 @@ curl -X POST http://localhost:8000/api/review \
   }'
 ```
 
-### Example Response:
-
-```json
-{
-  "analysis_id": "a3f5c8e7-...",
-  "stream_url": "/api/stream/a3f5c8e7-...",
-  "status": "started"
-}
-```
+---
 
 ## Project Structure
 
 ```
-architecture-council/
+Architect-Council/
 ├── backend/
-│   ├── agents/           # 5 agent definitions (one per file, one per LLM)
-│   ├── crews/            # Architecture crew configuration
-│   ├── tools/            # Architecture evaluation tools
-│   ├── schemas/          # Pydantic models for ADR domain
-│   ├── api/              # FastAPI routes
-│   └── main.py           # Application entry point
+│   ├── agents/           # Agent definitions — one file per agent, one LLM per agent
+│   │   ├── standards_analyst.py
+│   │   ├── dx_analyst.py
+│   │   ├── enterprise_architect.py
+│   │   ├── security_analyst.py
+│   │   └── da_chair.py
+│   ├── crews/
+│   │   ├── architecture_crew.py   # ADR review crew
+│   │   └── codebase_crew.py       # Codebase review crew (with pre-run tool injection)
+│   ├── tools/            # 8 evaluation tools for codebase review
+│   ├── schemas/          # Pydantic models
+│   ├── api/
+│   │   ├── routes.py             # ADR review endpoints
+│   │   ├── codebase_routes.py    # Codebase review endpoints
+│   │   ├── governance_routes.py  # Governance config endpoints
+│   │   └── query_routes.py       # Post-review Q&A endpoints
+│   ├── indexer/          # Repo cloning and indexing pipeline
+│   ├── governance/       # Governance rule loading and formatting
+│   └── main.py
 ├── frontend/
-│   ├── app/              # Next.js app router
-│   ├── components/       # React components
-│   ├── hooks/            # Custom React hooks
-│   ├── lib/              # Utilities & API client
-│   └── types/            # TypeScript definitions
-├── data/                 # Static config (tech radar, patterns, rules)
-│   ├── tech_radar.json
-│   ├── patterns.json
-│   ├── services.json
-│   ├── compliance_rules.json
-│   └── test_adrs.json
-├── .env.example          # Environment template
-├── pyproject.toml        # Python dependencies
-├── CONTRIBUTING.md       # Contribution guidelines
-├── CLAUDE.md             # Scope control
-└── README.md
+│   ├── app/
+│   │   ├── page.tsx              # ADR Review
+│   │   ├── codebase/page.tsx     # Codebase Review
+│   │   └── governance/page.tsx   # Governance Config
+│   ├── components/
+│   └── lib/
+├── docker/
+│   ├── docker-compose.yml
+│   ├── Dockerfile.backend
+│   └── Dockerfile.frontend
+├── governance/
+│   └── defaults/         # Default governance rules (YAML)
+├── data/                 # Static config (tech radar, patterns, compliance rules)
+├── .env.example
+├── pyproject.toml
+└── CLAUDE.md             # Scope control for AI-assisted development
 ```
 
-## Development
-
-### Backend Development
-
-```bash
-# Run with hot reload
-uv run architecture-council
-
-# Run tests
-uv run pytest
-
-# Type checking (if configured)
-uv run mypy backend
-```
-
-### Frontend Development
-
-```bash
-cd frontend
-
-# Development server
-bun dev
-
-# Lint
-bun lint
-
-# Build
-bun build
-```
+---
 
 ## How It Works
 
-1. **Input**: User submits an ADR proposal (title, technology, reason, affected services, data classification)
-2. **Parallel Evaluation**: 4 specialist agents evaluate in parallel:
-   - Standards Analyst checks tech radar, patterns, API standards
-   - DX Analyst researches community health, learning curve, adoption
-   - Enterprise Architect assesses strategic alignment, integration impact
-   - Security Analyst evaluates threat surface, compliance, failure modes
-3. **Synthesis**: DA Chair reviews all assessments, resolves conflicts, delivers ruling
-4. **Output**: Structured ruling (APPROVED/CONDITIONAL/REJECTED/DEFERRED) with conditions and rationale
+### ADR Review Flow
+1. User submits an ADR (title, technology, reason, affected services, data classification)
+2. Four specialist agents evaluate in parallel (~30–60 seconds)
+3. DA Chair synthesises all assessments into a weighted ruling
+4. Result streamed live via SSE; full report available for export
 
-**Typical execution time**: 30-60 seconds (with parallel execution)
+### Codebase Review Flow
+1. User submits a GitHub URL (or local path)
+2. Indexer clones the repo and builds metadata (file tree, language breakdown, dependencies, key files)
+3. Security tools (`SecretScannerTool`, `FileReaderTool`) are **pre-run in Python** and results injected into the security task description — this is required because Perplexity doesn't support function calling
+4. Four specialist agents evaluate in parallel against the indexed repo
+5. DA Chair synthesises with weighted scoring and produces a prioritised improvement roadmap
 
-## Test Cases
+---
 
-The `data/test_adrs.json` file contains 5 realistic test cases covering:
-- SHOULD APPROVE: Standard caching pattern (Redis)
-- APPROVE WITH CONDITIONS: GraphQL gateway (trial tech, multi-service)
-- SHOULD REJECT: MongoDB replacement for PostgreSQL (anti-pattern)
-- SHOULD DEFER: Dagger CI/CD migration (too new, unproven)
-- SHOULD DEFER: Effect-TS for billing (niche tech, team capability question)
+## Governance
 
-## Error Handling
+The council respects a governance configuration that can be set per-instance via the Governance Config UI or API. Governance rules influence agent scoring thresholds, mandatory findings, and compliance checks. Default rules are in `governance/defaults/`.
 
-The system implements graceful degradation:
-- **Configuration errors**: Clear messaging if API keys are missing
-- **Rate limiting**: Specific guidance for each provider
-- **Authentication errors**: Prompt to check API key validity
-- **Network errors**: Retry suggestions
-- **Timeouts**: Individual agent timeouts won't block the entire review
-- **Partial failures**: DA Chair synthesizes whatever assessments were received
+---
+
+## CI / Quality Gates
+
+Every push runs:
+- **Ruff** lint check (`uv run ruff check backend/`)
+- **mypy** type check (`uv run mypy backend/`)
+- **pytest** test suite
+- Across Python 3.11, 3.12, and 3.13
+
+Frontend CI runs `bun lint` and `bun build` on every push.
+
+---
 
 ## Contributing
 
-Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) first.
+Contributions welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) first.
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Commit with clear messages
+4. Ensure CI passes before opening a PR
 5. Open a Pull Request
+
+---
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT — see [LICENSE](LICENSE).
 
-## Acknowledgments
+## Acknowledgements
 
-- [CrewAI](https://www.crewai.com/) for the multi-agent orchestration framework
-- [OpenAI](https://openai.com/), [Anthropic](https://www.anthropic.com/), [Google](https://ai.google.dev/), [Perplexity](https://www.perplexity.ai/) for LLM APIs
+- [CrewAI](https://www.crewai.com/) for multi-agent orchestration
+- [OpenAI](https://openai.com/), [Anthropic](https://www.anthropic.com/), [Perplexity](https://www.perplexity.ai/) for LLM APIs
 - Inspired by real design authority boards and architecture review processes
